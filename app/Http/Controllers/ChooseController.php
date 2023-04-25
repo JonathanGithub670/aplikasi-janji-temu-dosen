@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Util\Exception;
 
 class ChooseController extends Controller
 {
@@ -41,6 +42,7 @@ class ChooseController extends Controller
             ->where('status', 1)
             ->whereNot('role','=','admin')
             ->whereNot('role','=','mahasiswa')->get();
+
         $data = [
             'users'=>$users,
             'list_pembahasan'=>Pembahasan::all(),
@@ -51,7 +53,7 @@ class ChooseController extends Controller
         return view('choose.index', $data);
     }
 
-    private function getFreeTime(array $work_times)
+    private function getFreeTime($work_times)
     {
 
         $office_start = new DateTime('08:00:00');
@@ -131,24 +133,32 @@ class ChooseController extends Controller
             }
         }
 
+
         return $free_time;
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'date' => 'required|date',
-            'pembahasan' => 'required',
-            'semester' => 'required',
-            // 'image' => 'required|image|file|mimes:jpeg,jpg,svg,png|max:1024|dimensions:max_width=800,max_height=800',
-            'image' => 'image|file|mimes:jpeg,jpg,svg,png|max:1366|dimensions:max_width=1366,max_height=768',
-            'keterangan' => 'required|max:200',
-        ]);
+        try {
+            $jam = explode(" - ",$request->jam);
+            $jam_mulai = $jam[0];
+            $jam_selesai = $jam[1];
 
-        $date = $this->convertInputDateToDateTime($request->date);
+            $date = date_format(date_create_from_format('m-d-Y', $request->date), 'Y-m-d');
 
-        if($this->isUserAvailable($request->user_id, $date, $request->image)) {
+
+            $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'date' => 'required',
+                'pembahasan' => 'required',
+                'semester' => 'required',
+                'jam'=> 'required',
+                'fakeJam'=>'required',
+                // 'image' => 'required|image|file|mimes:jpeg,jpg,svg,png|max:1024|dimensions:max_width=800,max_height=800',
+                'image' => 'image|file|mimes:jpeg,jpg,svg,png|max:1366|dimensions:max_width=1366,max_height=768',
+                'keterangan' => 'required|max:200',
+            ]);
+
             $choose = new Choose();
             $choose->user_id = $request->user_id;
             $choose->create_user_id = auth()->id();
@@ -165,15 +175,46 @@ class ChooseController extends Controller
             $choose->keterangan = $request->get('keterangan');
             $choose->save();
 
+            DB::table('time_chooses')
+                ->insert([
+                    'chooses_id'=>$choose->id,
+                    'jam_mulai'=> $jam_mulai,
+                    'jam_selesai'=> $jam_selesai
+                ]);
+
             return redirect()->route('dashboard.choose')
                 ->with('alert_type', 'success')
                 ->with('alert_message', 'Reservasi berhasil dibuat');
-        } else {
+        }catch (\Exception $e){
             return redirect()->back()
                 ->with('alert_type', 'danger')
-                ->with('alert_message', 'Reservasi gagal dibuat. User sudah memiliki reservasi pada tanggal dan jam
-                yang sama');
+                ->with('alert_message', 'Reservasi gagal dibuat.');
         }
+    }
+
+    public function getDisabledDate(Request $request){
+        $today = Carbon::now()->format('Y-m-d');
+        $dateCheck = DB::table('time_chooses')
+            ->join('chooses', 'chooses_id','=','chooses.id')
+            ->where('chooses.user_id', '=', $request->queryUserId)
+            ->whereDate('datetime', '>=', $today)
+            ->get()->groupBy('datetime');
+
+        $disabledDate = array();
+
+        foreach ($dateCheck as $items){
+            $work_time = array();
+
+            foreach ($items as $schedule){
+                $work_time[] = array(new DateTime($schedule->jam_mulai), new DateTime($schedule->jam_selesai));
+            }
+
+            if(count($this->getFreeTime($work_time)) == 0){
+                $disabledDate[] = date("d-m-Y", strtotime($items[0]->datetime));
+            }
+        }
+
+        return $disabledDate;
     }
 
 
@@ -182,10 +223,9 @@ class ChooseController extends Controller
         return Carbon::parse($inputDate)->format('Y-m-d H:i:s');
     }
 
-    public function isUserAvailable($userId, $date)
+    public function isUserAvailable($userId)
     {
-        $date = $this->convertInputDateToDateTime($date);
-        $result = Choose::where('user_id', $userId)->where('datetime', $date)->count();
+        $result = DB::table('users')->where('id','=', $userId)->count();
         return $result == 0;
     }
 

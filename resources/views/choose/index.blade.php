@@ -25,7 +25,7 @@
                 <p class="card-title-desc">
                     ini merupakan halaman untuk membuat reservasi pertemuan dengan Dosen, Fungsionaris dan Chaplin.
                 </p>
-                <form action="{{ route('dashboard.choose') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('dashboard.choose.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @if (session('alert_message'))
                         <div class="mt-5">
@@ -40,7 +40,7 @@
                         <label for="user_id" class="form-label fs-5 ">Pilih Pengguna</label>
                         <select id="user_id" class="form-select @error('user_id') is-invalid @enderror"
                             aria-label="Default select example" name="user_id" required>
-                            <option selected disabled>Pilih Orang yang ingin ditemui</option>
+                            <option hidden readonly>Pilih Orang yang ingin ditemui</option>
 
                             @foreach ($users->where('role') as $item)
                                 <option value="{{ $item->id }}">{{ $item->role }}</option>
@@ -56,7 +56,7 @@
                         <label for="user_id" class="form-label fs-5 ">Pilih Pengguna</label>
                         <select id="user_id" class="form-select @error('user_id') is-invalid @enderror"
                             aria-label="Default select example" name="user_id" required>
-                            <option selected disabled>Pilih Orang yang ingin ditemui</option>
+                            <option hidden readonly>Pilih Orang yang ingin ditemui</option>
 
                             @foreach ($users->where('role') as $item)
                                 <option value="{{ $item->id }}">{{ $item->role }}</option>
@@ -72,7 +72,7 @@
                         <label for="user_id" class="form-label fs-5 ">Pilih Jabatan</label>
                         <select id="user_id" class="form-select @error('user_id') is-invalid @enderror"
                             aria-label="Default select example" name="user_id" required>
-                            <option selected disabled>Pilih Orang yang ingin ditemui</option>
+                            <option hidden readonly>Pilih Orang yang ingin ditemui</option>
                             <option value="1">Dosen</option>
                             <option value="2">Fungsionaris</option>
                             <option value="3">Chaplin</option>
@@ -96,7 +96,7 @@
                         <label for="user_id" class="form-label fs-5 ">Pilih Dosen dan Chaplin</label>
                         <select id="user_id" class="form-select @error('user_id') is-invalid @enderror"
                             aria-label="select example" name="user_id" required onchange="saveUserId()">
-                            <option selected disabled>Pilih Orang yang ingin ditemui</option>
+                            <option hidden readonly>Pilih Orang yang ingin ditemui</option>
 
                             {{-- @foreach ($users->where('id', 4) as $item) --}}
                             @foreach ($users as $item)
@@ -115,7 +115,7 @@
                         <label for="semester" class="form-label fs-5 ">Pilih Semester</label>
                         <select id="semester" class="form-select @error('semester') is-invalid @enderror"
                             aria-label="select example" name="semester" required>
-                            <option selected disabled>Pilih Semester </option>
+                            <option hidden readonly>Pilih Semester </option>
                             @foreach ($list_semester as $item)
                                 <option value="{{ $item->id }}">{{ $item->isi_semester }}</option>
                             @endforeach
@@ -131,7 +131,7 @@
                         <label for="user_id" class="form-label fs-5 ">Pilih Jabatan</label>
                         <select id="user_id" class="form-select @error('user_id') is-invalid @enderror"
                             aria-label="Default select example" name="user_id" required>
-                            <option selected disabled>Pilih Orang yang ingin ditemui</option>
+                            <option hidden readonly>Pilih Orang yang ingin ditemui</option>
 
                             @foreach ($users->where('id', 3) as $item)
                                 <option value="{{ $item->id }}"><span class="text-capitalize">{{ $item->name }} | {{ $item->jabatan }}</span></option>
@@ -180,7 +180,7 @@
                         <input type="text" id="jam" name="jam" hidden>
                         <button type="button" class="btn btn-primary" onclick="pilihJam()" data-bs-toggle="modal"
                             data-bs-target="#staticBackdrop">
-                            Tentukan Jam Pertemuan
+                            <span id="tentukan-jam-pertemuan">Tentukan Jam Pertemuan</span>
                         </button>
 
                         <style>
@@ -216,7 +216,7 @@
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary">Pilih</button>
+                                        <button type="button" class="btn btn-primary" onclick="pilih()" data-bs-dismiss="modal">Pilih</button>
                                     </div>
                                 </div>
                             </div>
@@ -302,7 +302,7 @@
     <script type="text/javascript">
         let todayWithoutFormat = new Date().toLocaleDateString('en-US');
         let today = todayWithoutFormat.replace(/\//g, '-');
-        let datesForDisable = ["4-22-2023", "4-23-2023", "4-25-2023", "4-27-2023"];
+        let datesForDisable = [];
 
         if (datesForDisable.includes(today)) {
             $('.datepicker').datepicker({
@@ -323,17 +323,16 @@
             });
         }
 
-    </script>
-    <script>
         $('.input-link').on('click', function() {
             var input_id = $(this).data('input-id');
             $('#' + input_id).focus();
         });
 
-        let user_id, day, date;
+        let user_id, day, date, jam;
 
         function saveUserId() {
             user_id = document.getElementById("user_id").value;
+            getDisableDate();
         }
 
         function myConvertDate(yourDates){
@@ -355,23 +354,48 @@
             day = dates.toLocaleString('id-ID', options);
         }
 
-        function pilihJam() {
-            fetch('/dashboard/pilihJam?'+ new URLSearchParams(
+        function changeButtonJam(value){
+            jam = value;
+        }
+
+        function pilih(){
+            document.getElementById('tentukan-jam-pertemuan').innerHTML = jam;
+            document.getElementById('jam').value = jam;
+        }
+
+        function getDisableDate(){
+            fetch('/dashboard/getDisableData?'+ new URLSearchParams(
                 {
-                    queryUserId: user_id,
-                    queryDay: day,
-                    queryDate: date
+                    queryUserId: user_id
                 }))
                 .then(response => response.json())
-                .then(datas => {
-                    console.log(datas);
-                    let index = 0;
-                    document.getElementById('demos').innerHTML = '';
-                    datas.forEach((data) => {
-                        document.getElementById('demos').innerHTML += `<input type="radio" class="btn-check" name="jam" id="jam-${index}" autocomplete="off" value="${data.time}"><label class="btn btn-outline-primary" for="jam-${index}">${data.time}</label>`;
-                        index++;
+                .then(datas => {datesForDisable = datas;});
+        }
+
+        function pilihJam() {
+            if(user_id && day){
+                fetch('/dashboard/pilihJam?'+ new URLSearchParams(
+                    {
+                        queryUserId: user_id,
+                        queryDay: day,
+                        queryDate: date
+                    }))
+                    .then(response => response.json())
+                    .then(datas => {
+                        let index = 0;
+                        document.getElementById('demos').innerHTML = '';
+                        datas.forEach((data) => {
+                            if(data.status){
+                                document.getElementById('demos').innerHTML += `<input type="radio" class="btn-check" name="fakeJam" id="jam-${index}" autocomplete="off" value="${data.time}" onclick="changeButtonJam('${data.time}')"><label class="btn btn-outline-primary" for="jam-${index}">${data.time}</label>`;
+                            }else{
+                                document.getElementById('demos').innerHTML += `<input type="radio" class="btn-check" name="fakeJam" id="jam-${index}" autocomplete="off" value="${data.time}" disabled><label class="btn btn-secondary" for="jam-${index}">${data.time}</label>`;
+                            }
+                            index++;
+                        });
                     });
-                })
+            }else{
+                document.getElementById('demos').innerHTML = '<p class="text-center">Silahkan pilih Dosen/Chaplin dan Tanggal terlebih dahulu</p>';
+            }
         }
 
     </script>

@@ -68,7 +68,8 @@ Route::middleware('auth')->group(function () {
             // Route::get('/', [DashboardController::class, 'lockScreen'])->name('dashboard.lock-screen');
             Route::get('choose',[ChooseController::class, 'index'])->name('dashboard.choose');
             Route::get('pilihJam', [ChooseController::class, 'pilihJam']);
-            Route::post('choose',[ChooseController::class, 'store']);
+            Route::get('getDisableData', [ChooseController::class, 'getDisabledDate']);
+            Route::post('choose',[ChooseController::class, 'store'])->name('dashboard.choose.store');
             Route::get('history',[HistoryController::class, 'index'])->name('dashboard.history');
             Route::get('history/{history}/delete',[HistoryController::class,
             'destroy'])->name('dashboard.history-destroy');
