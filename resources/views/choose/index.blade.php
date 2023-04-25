@@ -208,7 +208,6 @@
 
                                     <div class="modal-body" id="modal-body">
                                             <div class="d-grid">
-                                                ## PLACE BUTTON
                                                 <div id="demos" class="btn-group flex-column" role="group" aria-label="Basic radio toggle button group">
 
                                                 </div>
@@ -336,6 +335,14 @@
             user_id = document.getElementById("user_id").value;
         }
 
+        function myConvertDate(yourDates){
+            let myDates = yourDates.split("/");
+            let bulan = myDates[1] < 10?"0"+myDates[1]:myDates[1];
+            let tanggal = myDates[0] < 10?"0"+myDates[0]:myDates[0];
+
+            return myDates[2]+"-"+bulan+"-"+tanggal
+        }
+
         function saveDate() {
             const dates = new Date(document.getElementById("date").value);
             const options = {
@@ -343,20 +350,22 @@
                 timeZone: 'Asia/Jakarta'
             };
 
+            date = myConvertDate(dates.toLocaleDateString('id-ID', {timeZone: 'Asia/Jakarta'}));
             day = dates.toLocaleString('id-ID', options);
-            date = dates.toISOString().substring(0, 10);
         }
 
         function pilihJam() {
-            fetch('/dashboard/pilihJam',
+            fetch('/dashboard/pilihJam?'+ new URLSearchParams(
                 {
                     queryUserId: user_id,
                     queryDay: day,
                     queryDate: date
-                })
+                }))
                 .then(response => response.json())
                 .then(datas => {
+                    console.log(datas);
                     let index = 0;
+                    document.getElementById('demos').innerHTML = '';
                     datas.forEach((data) => {
                         document.getElementById('demos').innerHTML += `<input type="radio" class="btn-check" name="jam" id="jam-${index}" autocomplete="off" value="${data.time}"><label class="btn btn-outline-primary" for="jam-${index}">${data.time}</label>`;
                         index++;
