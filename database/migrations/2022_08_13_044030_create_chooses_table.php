@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('create_user_id');
             $table->foreign('create_user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
-            $table->dateTime('datetime');
+            $table->dateTime('date');
             $table->string('pembahasan');
             $table->string('semester');
             $table->string('image')->nullable();
