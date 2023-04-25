@@ -101,7 +101,7 @@
                             {{-- @foreach ($users->where('id', 4) as $item) --}}
                             @foreach ($users as $item)
                                 <option value="{{ $item->id }}"><span>{{ $item->name }}</span>
-                                    ({{ $item->jabatan }})</span></option>
+                                    ({{ $item->jabatan }})</option>
                             @endforeach
                         </select>
                         @error('user_id')
@@ -178,7 +178,7 @@
                     </div>
                     <div class="mb-3">
                         <input type="text" id="jam" name="jam" hidden>
-                        <button type="button" class="btn btn-primary" onclick="pilihJam()" data-bs-toggle="modal";'[00-=]
+                        <button type="button" class="btn btn-primary" onclick="pilihJam()" data-bs-toggle="modal"
                             data-bs-target="#staticBackdrop">
                             Tentukan Jam Pertemuan
                         </button>
@@ -267,6 +267,7 @@
                             </div>
                         </div>
                     </div>
+                </form>
             </div>
         </div>
 
