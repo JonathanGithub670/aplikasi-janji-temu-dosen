@@ -17,8 +17,8 @@ use Illuminate\Database\Query\Builder as DatabaseQueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
-
+use PHPUnit\Exception;
+use App\Http\Controllers\DummyList;
 class ListController extends Controller
 {
     // public function index(Request $request)
@@ -88,28 +88,102 @@ class ListController extends Controller
 
     public function calendar(Request $request)
     {
+        if($request->month && $request->year){
+            $month = intval($request->month);
+            $year = intval($request->year);
+        }else{
+            $month = intval(date('m'));
+            $year = intval(date('Y'));
+        }
+
+        $chooses = [];
         $search = $request->get('search')?:"";
         if (Auth::user()->role == 'admin') {
-            $lists = Choose::where('status', '!=', null)->paginate(5) ? $this->getReservationAdminCalendar($search)
+            $chooses = Choose::where('status', '!=', null)->paginate(5) ? $this->getReservationAdminCalendar($search)
             : $this->getReservationCalendar($search);
         }elseif (Auth::user()->role == 'dosen') {
-            $lists = Choose::where('user_id', auth()->id())->where('status', '!=', null)->paginate(5)
+            $chooses = Choose::where('user_id', auth()->id())->where('status', '!=', null)->paginate(5)
             ? $this->getReservationCalendar($search) : $this->getReservationAdminCalendar($search);
         }elseif (Auth::user()->role == 'mahasiswa') {
-            $lists = Choose::where('user_id', auth()->id())->where('status', '!=', null)->paginate(5);
+            $chooses = Choose::where('user_id', auth()->id())->where('status', '!=', null)->paginate(5);
         }elseif (Auth::user()->role == 'chaplin') {
-            $lists = Choose::where('user_id', auth()->id())->where('status', '!=', null)->paginate(5)
+            $chooses = Choose::where('user_id', auth()->id())->where('status', '!=', null)->paginate(5)
             ? $this->getReservationCalendar($search) : $this->getReservationAdminCalendar($search);
         }elseif (Auth::user()->role == 'fungsionaris') {
-            $lists = Choose::where('user_id', auth()->id())->where('status', '!=', null)->paginate(5)
+            $chooses = Choose::where('user_id', auth()->id())->where('status', '!=', null)->paginate(5)
             ? $this->getReservationCalendar($search) : $this->getReservationAdminCalendar($search);
         }
         $data = [
         // 'list_pembahasan'=>Pembahasan::all(),
         // 'list_pembahasan'=>Pembahasan::paginate(5),
         // 'list_semester'=>Semester::paginate(5),
-        'lists'=> $lists
+        'lists'=> $chooses
         ];
+
+        $chooses = DB::table('chooses')
+            ->join('users','create_user_id','=','users.id')
+            ->where('chooses.user_id','=', auth()->id())
+            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS varchar(40)) as keterangan, datetime")
+            ->whereYear('datetime', '=', $year)
+            ->whereMonth('datetime', '=', $month)->get();
+        //return $chooses->get();
+        $routines = DB::table('routines')
+            ->whereNot('keterangan', '=', 'ibadah')
+            ->where('user_id', '=', auth()->id())
+            ->selectRaw('CAST(keterangan as varchar(40)) as keterangan, jam_mulai AS datetime');
+        //return $routines->count() + $chooses->count();
+        $blueprint_routine_month = $routines->get();
+        //$lists = $routines->unionAll($chooses)->get();
+        //return $lists;
+
+        $start_date = new DateTime("$year-$month-01"); // create a DateTime object for the first day of the month
+        $end_date = new DateTime("$year-$month-" . $start_date->format('t')); // create a DateTime object for the last day of the month
+
+        $date_period = new DatePeriod(
+            $start_date,
+            new DateInterval('P1D'),
+            $end_date->modify('+1 day')
+        );
+
+        $dates = array();
+
+        foreach ($date_period as $date) {
+            if ($date->format('l') != 'Saturday' && $date->format('l') != 'Sunday') {
+                $dates[] = $date->format('Y-m-d');
+            }
+        }
+
+        $result = array();
+
+        foreach($dates as $date){
+            foreach ($blueprint_routine_month as $item) {
+                $dummy = new DummyList();
+                $dummy->keterangan = $item->keterangan;
+                $dummy->datetime = $date." ".$item->datetime;
+                $result[] = $dummy;
+            }
+        }
+
+        $time_chooses = DB::table('time_chooses')
+            ->join('chooses', 'chooses_id', '=', 'chooses.id')
+            ->where('chooses.user_id', '=', auth()->id())
+            ->select('jam_mulai')
+            ->get();
+        $choose_arr = array();
+        if(count($time_chooses)){
+            $index = 0;
+            for ($i = 0; $i < count($chooses); $i++){
+                if($chooses[$i]->keterangan != "mengajar" && $chooses[$i]->keterangan != "istirahat"){
+                    $temp = explode(" ", $chooses[$i]->datetime);
+                    $chooses[$i]->datetime = $temp[0]." ".$time_chooses[$index]->jam_mulai;
+                    $choose_arr[] = $chooses[$i];
+                    $index++;
+                }
+            }
+        }
+
+        $lists = array_merge($result, $choose_arr);
+
         // return view('list.index', compact('lists'));
         return view('calendar.index', compact('lists'), $data);
     }
@@ -125,6 +199,8 @@ class ListController extends Controller
             // ->select('chooses.*', 'nama_program_studi', 'program_studi.prodi_create_user_id as prodi_nim','users.nim','name','email','role','users.id as id_users', 'users.status as status_users')
             ->where('chooses.user_id','=',auth()->id())
             ->where('nim','like',"%$search%")
+                ->orderBy('pembahasan')
+                ->orderByDesc('datetime')
             ->paginate(5);
         }else{
             // return Choose::where('user_id', auth()->id())->get();
@@ -135,6 +211,8 @@ class ListController extends Controller
             // ->select('chooses.*', 'nama_program_studi', 'program_studi.prodi_create_user_id as prodi_nim','users.nim','name','email','role','users.id as id_users', 'users.status as status_users')
             ->where('chooses.user_id','=',auth()->id())
             ->where('nim','like',"%$search%")
+                ->orderBy('pembahasan')
+                ->orderByDesc('datetime')
             ->paginate(5);
         }
     }
@@ -149,6 +227,8 @@ class ListController extends Controller
             ->select('chooses.*', 'nama_program_studi', 'program_studi.prodi_create_user_id as prodi_nim','users.nim','name','role','users.id as id_users', 'users.status as status_users')
             // ->select('chooses.*', 'nama_program_studi', 'program_studi.prodi_create_user_id as prodi_nim','users.nim','name','email','role','users.id as id_users', 'users.status as status_users')
             ->where('nim','like',"%$search%")
+                ->orderBy('pembahasan')
+                ->orderByDesc('datetime')
             ->paginate(5);
         }else{
             // return Choose::all();
@@ -170,10 +250,9 @@ class ListController extends Controller
         // return Choose::where('user_id', auth()->id())->get();
         return DB::table('chooses')
         ->join('users','create_user_id','=','users.id')
-        ->select('chooses.*','nim','name','role','users.id as id_users', 'users.status as status_users')
+            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS varchar(40)) as keterangan, datetime")
         // ->select('chooses.*','nim','name','email','role','users.id as id_users', 'users.status as status_users')
-        ->where('chooses.user_id','=',auth()->id())
-        ->paginate();
+        ->where('chooses.user_id','=',auth()->id());
     }
 
     public function getReservationAdminCalendar($search)
@@ -181,8 +260,7 @@ class ListController extends Controller
         // return Choose::where('user_id', auth()->id())->get();
         return  DB::table('chooses')
         ->join('users','create_user_id','=','users.id')
-        ->select('chooses.*','nim','name','role','users.id as id_users', 'users.status as status_users')->paginate();
-        // ->select('chooses.*','nim','name','email','role','users.id as id_users', 'users.status as status_users')->paginate();
+            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS varchar(40)) as keterangan, datetime");// ->select('chooses.*','nim','name','email','role','users.id as id_users', 'users.status as status_users')->paginate();
     }
 
 
@@ -249,21 +327,38 @@ class ListController extends Controller
     }
 
     public function jadwalDosen(Request $request){
-         $lists = DB::table('chooses')
-             ->join('users','create_user_id','=','users.id')
-             ->select('chooses.*','nim','name','role','users.id as id_users', 'users.status as status_users')
-             // ->select('chooses.*','nim','name','email','role','users.id as id_users', 'users.status as status_users')
-             ->where('chooses.user_id','=',$request->id)
-             ->paginate();
+        $chooses = DB::table('chooses')
+            ->join('users','create_user_id','=','users.id')
+            ->where('chooses.user_id','=', $request->id)
+            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS varchar(40)) as keterangan, datetime");
 
-         $data = [
-             // 'list_pembahasan'=>Pembahasan::all(),
-             // 'list_pembahasan'=>Pembahasan::paginate(5),
-             // 'list_semester'=>Semester::paginate(5),
-             'lists'=> $lists
-         ];
+        //return $chooses->get();
+        $routines = DB::table('routines')
+            ->whereNot('keterangan', '=', 'ibadah')
+            ->where('user_id', '=', $request->id)
+            ->selectRaw('CAST(keterangan as varchar(40)) as keterangan, jam_mulai AS datetime');
+        //return $routines->count() + $chooses->count();
+        $lists = $routines->unionAll($chooses)->get();
+
+        $time_chooses = DB::table('time_chooses')
+            ->join('chooses', 'chooses_id', '=', 'chooses.id')
+            ->where('chooses.user_id', '=', $request->id)
+            ->select('jam_mulai')
+            ->get();
+
+
+
+        $index = 0;
+        for ($i = 0; $i < count($lists); $i++){
+            if($lists[$i]->keterangan != "mengajar" && $lists[$i]->keterangan != "istirahat"){
+                $temp = explode(" ", $lists[$i]->datetime);
+                $lists[$i]->datetime = $temp[0]." ".$time_chooses[$index]->jam_mulai;
+                $index++;
+            }
+        }
+
          // return view('list.index', compact('lists'));
-         return view('calendar.index', compact('lists'), $data);
+         return view('calendar.index', compact('lists'));
      }
 }
 // public function getReservation2(){

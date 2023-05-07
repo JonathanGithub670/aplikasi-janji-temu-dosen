@@ -104,7 +104,37 @@
 {{--            height: 30px;--}}
 {{--        }--}}
 {{--    </style>--}}
+    <style>
+        .fc-time-grid-event{
+            width: 18%;
+            height: 27px;
+            padding: 0;
+        }
+        .border-success {
+            border-color: #28a745 !important;
+        }
+
+        .border-danger {
+            border-color: #dc3545 !important;
+        }
+    </style>
     <script>
+        let pageMode = "dayGridMonth";
+        @if(isset($_GET['view']))
+            @if(request()->get('view') == "week")
+            pageMode = "timeGridWeek";
+            @elseif(request()->get('view') == "day")
+                pageMode = "timeGridDay";
+            @else
+                pageMode = "dayGridMonth";
+            @endif
+        @endif
+        let pageDefaultDate = 0;
+        @if(request()->get('month') && request()->get('year'))
+            pageDefaultDate = `{{ request()->get('year') }}-{{ request()->get('month') }}-01`;
+        @else
+            pageDefaultDate = `{{ date('Y') }}-{{ date('m') }}-01`;
+        @endif
         ! function(g) {
             "use strict";
 
@@ -131,25 +161,27 @@
                         }
                     }
                 });
-
                 var c = [
 
                     @foreach ($lists as $item)
                     {
-                        // title: "All Day Event",
-                        // start: new Date(o, d, 1)
-                        // title: '',
-                        // title: '{{ $item->name }}',
-                        // start: '{{ $item->datetime }}',
-                        // className:
-                        // id: '{{ $item->id }}',
-                        title: "{{ $item->nim }} | {{ $item->name }}",
-                        // start: '{{ $item->datetime }}',
+                        title: "{{ $item->keterangan }}",
                         start: '{{ $item->datetime }}',
-                        // start: '{{ $item->datetime }}',
-                        // allDay: '{{ $item->nim }}',
-                        // className: "bg-info"
-
+                        // IF $item->keterangan mengajar, then class name is bg-blue outline-blue, if pertemuan success outline-sucess, if istirahat danger outline-danger
+                        @php
+                            $className = 'bg-primary';
+                            switch ($item->keterangan) {
+                                case 'mengajar':
+                                    $className = "bg-success border-success";
+                                    break;
+                                case 'istirahat':
+                                    $className = "bg-danger border-danger";
+                                    break;
+                                default:
+                                    break;
+                            }
+                        @endphp
+                        className: '{{ $className }}'
                     },
                     @endforeach
                     ],
@@ -167,7 +199,8 @@
                     droppable: false,
                     // selectable: !0,
                     selectable: false,
-                    defaultView: "dayGridMonth",
+                    defaultView: pageMode,
+                    defaultDate: pageDefaultDate,
                     themeSystem: "bootstrap",
                     header: {
                         left: "prev,next today",
@@ -185,9 +218,15 @@
                     events: c,
                     hiddenDays: [0,6],
                     minTime: '08:00:00',
-                    maxTime: '18:00:00'
-                });
+                    maxTime: '18:00:00',
+                    views: {
+                        dayGridMonth: {
+                            eventLimit: 4
+                        }
+                    }
+                        });
                 m.render(), g(a).on("submit", function(e) {
+                    console.log("Hell");
                     e.preventDefault();
                     g("#form-event :input");
                     var t, a = g("#event-title").val(),
@@ -196,24 +235,164 @@
                         .classList.add("was-validated")) : (i ? (i.setProp("title", a), i.setProp(
                         "classNames", [n])) : (t = {
                         title: a,
-                        start: r.date,
+                        start: r.date+"sslx",
                         allDay: r.allDay,
                         className: n
                     }, m.addEvent(t)), l.modal("hide"))
-                }), g("#btn-delete-event").on("click", function(e) {
-                    i && (i.remove(), i = null, l.modal("hide"))
-                }), g("#btn-new-event").on("click", function(e) {
-                    u({
-                        date: new Date,
-                        allDay: !0
-                    })
-                })
+                    }), g("#btn-delete-event").on("click", function(e) {
+                        i && (i.remove(), i = null, l.modal("hide"))
+                    }), g("#btn-new-event").on("click", function(e) {
+                        u({
+                            date: new Date,
+                            allDay: !0
+                        })
+                    });
             }, g.CalendarPage = new e, g.CalendarPage.Constructor = e
         }(window.jQuery),
         function() {
             "use strict";
             window.jQuery.CalendarPage.init()
         }();
+    </script>
+    <script>
+        const monthMap = {
+            'January': '01',
+            'February': '02',
+            'March': '03',
+            'April': '04',
+            'May': '05',
+            'June': '06',
+            'July': '07',
+            'August': '08',
+            'September': '09',
+            'October': '10',
+            'November': '11',
+            'December': '12'
+        };
+        const todayButton = document.querySelectorAll('.fc-today-button');
+        todayButton.forEach(button => {
+            button.addEventListener('click', () => {
+                let today = new Date();
+
+                let year = today.getFullYear();
+                let month = ('0' + (today.getMonth() + 1)).slice(-2); // Add leading zero if needed
+                let day = ('0' + today.getDate()).slice(-2); // Add leading zero if needed
+
+                pageDefaultDate = year + '-' + month + '-' + day;
+                // Refresh the page with the updated URL
+                let url = window.location.href.split('?')[0];
+                @if(isset($_GET['view']))
+                    url = url + "?view="+ {{request()->get('view')}};
+                @endif
+                    console.log(pageDefaultDate);
+                window.location.href = url;
+            });
+        });
+        const prevButtons = document.querySelectorAll('.fc-prev-button');
+        prevButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const monthYearElement = document.querySelector(".fc-center");
+                const MonthYear = monthYearElement.querySelector("h2").innerHTML;
+                const getMonthYear = MonthYear.split(' ');
+                const theMonth = monthMap[getMonthYear[0]];
+                const theYear = getMonthYear[1];
+                const queryString = `month=${theMonth}&year=${theYear}`;
+
+                // Get the current URL
+                const url = new URL(window.location.href);
+
+                // Update the query string
+                url.search = new URLSearchParams(queryString).toString();
+
+                // Refresh the page with the updated URL
+                window.location.href = url.toString();
+            });
+        });
+        const nextButtons = document.querySelectorAll('.fc-next-button');
+        nextButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const monthYearElement = document.querySelector(".fc-center");
+                const MonthYear = monthYearElement.querySelector("h2").innerHTML;
+                const getMonthYear = MonthYear.split(' ');
+                const theMonth = monthMap[getMonthYear[0]];
+                const theYear = getMonthYear[1];
+                const queryString = `month=${theMonth}&year=${theYear}`;
+
+                // Get the current URL
+                const url = new URL(window.location.href);
+
+                // Update the query string
+                url.search = new URLSearchParams(queryString).toString();
+
+                // Refresh the page with the updated URL
+                window.location.href = url.toString();
+            });
+        });
+        const monthButton = document.querySelectorAll('.fc-dayGridMonth-button');
+        monthButton.forEach(button => {
+            button.addEventListener('click', () => {
+                const monthYearElement = document.querySelector(".fc-center");
+                const MonthYear = monthYearElement.querySelector("h2").innerHTML;
+                const getMonthYear = MonthYear.split(' ');
+                const theMonth = monthMap[getMonthYear[0]];
+                const theYear = getMonthYear[1];
+                const queryString = `month=${theMonth}&year=${theYear}&view=month`;
+
+                // Get the current URL
+                const url = new URL(window.location.href);
+
+                // Update the query string
+                url.search = new URLSearchParams(queryString).toString();
+
+                // Refresh the page with the updated URL
+                window.location.href = url.toString();
+            });
+        });
+        const weekButton = document.querySelectorAll('.fc-timeGridWeek-button');
+        weekButton.forEach(button => {
+            button.addEventListener('click', () => {
+                const monthYearElement = document.querySelector(".fc-center");
+                const MonthYear = monthYearElement.querySelector("h2").innerHTML;
+                const getMonthYear = MonthYear.split(' ');
+                const theMonth = monthMap[getMonthYear[0]];
+                const theYear = getMonthYear[1];
+                const queryString = `month=${theMonth}&year=${theYear}&view=week`;
+
+                // Get the current URL
+                const url = new URL(window.location.href);
+
+                // Update the query string
+                url.search = new URLSearchParams(queryString).toString();
+
+                // Refresh the page with the updated URL
+                window.location.href = url.toString();
+            });
+        });
+        const dayButton = document.querySelectorAll('.fc-timeGridDay-button');
+        dayButton.forEach(button => {
+            button.addEventListener('click', () => {
+                let monthYearElement = document.querySelector(".fc-center");
+                let MonthYear = monthYearElement.querySelector("h2").innerHTML;
+                let getMonthYear = MonthYear.split(' ');
+                let theMonth = monthMap[getMonthYear[0]];
+                let theYear = getMonthYear[1];
+                @if(isset($_GET['month']) && isset($_GET['year']))
+                    theMonth = {{strval(request()->get('month'))}};
+                    theYear = {{request()->get('year')}};
+                @endif
+
+                const queryString = `month=${theMonth}&year=${theYear}&view=day`;
+
+                // Get the current URL
+                const url = new URL(window.location.href);
+
+                // Update the query string
+                url.search = new URLSearchParams(queryString).toString();
+
+                // Refresh the page with the updated URL
+                window.location.href = url.toString();
+            });
+        });
     </script>
     {{-- @endforeach --}}
 
