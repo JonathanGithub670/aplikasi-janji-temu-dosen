@@ -52,18 +52,18 @@
                             <div class="card-body">
                                 <div id="jadwal_dosen"></div>
                             </div>
-                            
+
                         </div>
                     </div> <!-- end col -->
                 </div>
             </div>
         </div>
     </div>
-    
+
 @endsection
 
 @section('script')
-    
+
     {{-- <script src="{{ asset('assets/js/pages/calendars-full.init.js') }}"></script> --}}
     <script src="{{ asset('assets/libs/moment/min/moment.min.js') }}"></script>
     <script src="{{ asset('assets/libs/jquery-ui-dist/jquery-ui.min.js') }}"></script>
@@ -75,7 +75,7 @@
 
     {{-- @foreach ($lists as $item) --}}
         {{-- @dd($lists) --}}
-    
+
     <script>
         ! function(g) {
             "use strict";
@@ -107,12 +107,12 @@
                         // title: "All Day Event",
                         // start: new Date(o, d, 1)
                         // title: '',
-                        
+
                         // className:
-                        
+
                         // className: "bg-info"
                 ],
-                
+
                     v = (document.getElementById("external-events"), document.getElementById("jadwal_dosen"));
 
                 // function u(e) {

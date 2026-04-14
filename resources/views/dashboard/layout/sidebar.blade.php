@@ -10,6 +10,12 @@
                 <span key="t-dashboards">Dashboards</span>
             </a>
         </li>
+        <li>
+            <a href="{{ route('dashboard.topsis') }}" class="waves-effect">
+                <i class="fas fa-clipboard-list"></i>
+                <span key="t-layouts">Metode Topsis</span>
+            </a>
+        </li>
         @endrole
         {{-- @role(['admin','mahasiswa'])
         <li>
@@ -19,6 +25,15 @@
             </a>
         </li>
         @endrole --}}
+        @role(['dosen','chaplin','fungsionaris'])
+        <li class="menu-title" key="t-menu">Menu</li>
+        <li>
+            <a href="{{ route('dashboard.topsis') }}" class="waves-effect">
+                <i class="fas fa-clipboard-list"></i>
+                <span key="t-layouts">Metode Topsis</span>
+            </a>
+        </li>
+        @endrole
         <li class="menu-title" key="t-apps">Aplikasi</li>
         {{-- @role(['user']) --}}
         @role(['mahasiswa'])
@@ -36,6 +51,26 @@
                 <i class="bx bx-table"></i>
                 <span class="badge rounded-pill float-end" key="t-new"></span>
                 <span key="t-file-manager">Daftar Pertemuan</span>
+            </a>
+        </li>
+        @endrole
+        @role(['admin'])
+        <li>
+            <a href="{{ route('dashboard.routines') }}" class="waves-effect">
+                {{-- <i class="bx bx-file"></i> --}}
+                <i class="bx bx-calendar-event"></i>
+                <span class="badge rounded-pill float-end" key="t-new"></span>
+                <span key="t-file-manager">Rutinitas Dosen</span>
+            </a>
+        </li>
+        @endrole
+        @role(['dosen','chaplin','fungsionaris'])
+        <li>
+            <a href="{{ route('dashboard.routines.detail.dosen') }}" class="waves-effect">
+                {{-- <i class="bx bx-file"></i> --}}
+                <i class="bx bx-calendar-event"></i>
+                <span class="badge rounded-pill float-end" key="t-new"></span>
+                <span key="t-file-manager">Rutinitas Dosen</span>
             </a>
         </li>
         @endrole

@@ -13,7 +13,7 @@
     <tbody>
         @forelse ($histories as $key => $history)
             <tr>
-                <td>{{ ($histories->currentpage() - 1) * $histories->perpage() + $key + 1 }}</td>
+                <td>{{ $loop->iteration }}</td>
                 @can('isAdmin')
                     <td>{{ $history->create->name }}</td>
                 @elsecan('isDosen')

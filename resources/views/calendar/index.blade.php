@@ -61,7 +61,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body bg-dark">
-                <h4 class="card-title text-light">Jadwal Dosen Nama Dosen</h4>
+                <h4 class="card-title text-light">Jadwal Dosen : {{ $data['dosen']->name }} ({{ $data['dosen']->nim }})</h4>
                 <p class="card-title-desc text-light">
                     ini merupakan halaman untuk menampilkan jadwal dosen berbentuk kalender
                 </p>
@@ -97,8 +97,8 @@
     <script src="{{ asset('assets/libs/%40fullcalendar/timegrid/main.min.js') }}"></script>
     <script src="{{ asset('assets/libs/%40fullcalendar/interaction/main.min.js') }}"></script>
 
-    {{-- @foreach ($lists as $item) --}}
-        {{-- @dd($lists) --}}
+    {{-- @foreach ($data['lists'] as $item) --}}
+        {{-- @dd($data['lists']) --}}
 {{--    <style>--}}
 {{--        .fc-time-grid-event{--}}
 {{--            height: 30px;--}}
@@ -119,6 +119,7 @@
         }
     </style>
     <script>
+        let asd = 1;
         let pageMode = "dayGridMonth";
         @if(isset($_GET['view']))
             @if(request()->get('view') == "week")
@@ -130,10 +131,11 @@
             @endif
         @endif
         let pageDefaultDate = 0;
+        let nowDay = ('0' + new Date().getDate()).slice(-2);
         @if(request()->get('month') && request()->get('year'))
-            pageDefaultDate = `{{ request()->get('year') }}-{{ request()->get('month') }}-01`;
+            pageDefaultDate = `{{ request()->get('year') }}-{{ request()->get('month') }}-${nowDay}`;
         @else
-            pageDefaultDate = `{{ date('Y') }}-{{ date('m') }}-01`;
+            pageDefaultDate = `{{ date('Y') }}-{{ date('m') }}-${nowDay}`;
         @endif
         ! function(g) {
             "use strict";
@@ -163,10 +165,11 @@
                 });
                 var c = [
 
-                    @foreach ($lists as $item)
+                    @foreach ($data['lists'] as $item)
                     {
                         title: "{{ $item->keterangan }}",
-                        start: '{{ $item->datetime }}',
+                        start: '{{ $item->jam_mulai }}',
+                        end: '{{ $item->jam_selesai }}',
                         // IF $item->keterangan mengajar, then class name is bg-blue outline-blue, if pertemuan success outline-sucess, if istirahat danger outline-danger
                         @php
                             $className = 'bg-primary';
@@ -218,15 +221,15 @@
                     events: c,
                     hiddenDays: [0,6],
                     minTime: '08:00:00',
-                    maxTime: '18:00:00',
+                    maxTime: '21:00:00',
                     views: {
                         dayGridMonth: {
                             eventLimit: 4
-                        }
-                    }
+                        },
+                        title: "ss"
+                    },
                         });
                 m.render(), g(a).on("submit", function(e) {
-                    console.log("Hell");
                     e.preventDefault();
                     g("#form-event :input");
                     var t, a = g("#event-title").val(),
@@ -235,7 +238,7 @@
                         .classList.add("was-validated")) : (i ? (i.setProp("title", a), i.setProp(
                         "classNames", [n])) : (t = {
                         title: a,
-                        start: r.date+"sslx",
+                        start: r.date,
                         allDay: r.allDay,
                         className: n
                     }, m.addEvent(t)), l.modal("hide"))
@@ -247,151 +250,19 @@
                             allDay: !0
                         })
                     });
+
             }, g.CalendarPage = new e, g.CalendarPage.Constructor = e
         }(window.jQuery),
         function() {
             "use strict";
             window.jQuery.CalendarPage.init()
         }();
-    </script>
-    <script>
-        const monthMap = {
-            'January': '01',
-            'February': '02',
-            'March': '03',
-            'April': '04',
-            'May': '05',
-            'June': '06',
-            'July': '07',
-            'August': '08',
-            'September': '09',
-            'October': '10',
-            'November': '11',
-            'December': '12'
-        };
-        const todayButton = document.querySelectorAll('.fc-today-button');
-        todayButton.forEach(button => {
-            button.addEventListener('click', () => {
-                let today = new Date();
 
-                let year = today.getFullYear();
-                let month = ('0' + (today.getMonth() + 1)).slice(-2); // Add leading zero if needed
-                let day = ('0' + today.getDate()).slice(-2); // Add leading zero if needed
-
-                pageDefaultDate = year + '-' + month + '-' + day;
-                // Refresh the page with the updated URL
-                let url = window.location.href.split('?')[0];
-                @if(isset($_GET['view']))
-                    url = url + "?view="+ {{request()->get('view')}};
-                @endif
-                    console.log(pageDefaultDate);
-                window.location.href = url;
-            });
-        });
-        const prevButtons = document.querySelectorAll('.fc-prev-button');
-        prevButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const monthYearElement = document.querySelector(".fc-center");
-                const MonthYear = monthYearElement.querySelector("h2").innerHTML;
-                const getMonthYear = MonthYear.split(' ');
-                const theMonth = monthMap[getMonthYear[0]];
-                const theYear = getMonthYear[1];
-                const queryString = `month=${theMonth}&year=${theYear}`;
-
-                // Get the current URL
-                const url = new URL(window.location.href);
-
-                // Update the query string
-                url.search = new URLSearchParams(queryString).toString();
-
-                // Refresh the page with the updated URL
-                window.location.href = url.toString();
-            });
-        });
-        const nextButtons = document.querySelectorAll('.fc-next-button');
-        nextButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const monthYearElement = document.querySelector(".fc-center");
-                const MonthYear = monthYearElement.querySelector("h2").innerHTML;
-                const getMonthYear = MonthYear.split(' ');
-                const theMonth = monthMap[getMonthYear[0]];
-                const theYear = getMonthYear[1];
-                const queryString = `month=${theMonth}&year=${theYear}`;
-
-                // Get the current URL
-                const url = new URL(window.location.href);
-
-                // Update the query string
-                url.search = new URLSearchParams(queryString).toString();
-
-                // Refresh the page with the updated URL
-                window.location.href = url.toString();
-            });
-        });
-        const monthButton = document.querySelectorAll('.fc-dayGridMonth-button');
-        monthButton.forEach(button => {
-            button.addEventListener('click', () => {
-                const monthYearElement = document.querySelector(".fc-center");
-                const MonthYear = monthYearElement.querySelector("h2").innerHTML;
-                const getMonthYear = MonthYear.split(' ');
-                const theMonth = monthMap[getMonthYear[0]];
-                const theYear = getMonthYear[1];
-                const queryString = `month=${theMonth}&year=${theYear}&view=month`;
-
-                // Get the current URL
-                const url = new URL(window.location.href);
-
-                // Update the query string
-                url.search = new URLSearchParams(queryString).toString();
-
-                // Refresh the page with the updated URL
-                window.location.href = url.toString();
-            });
-        });
-        const weekButton = document.querySelectorAll('.fc-timeGridWeek-button');
-        weekButton.forEach(button => {
-            button.addEventListener('click', () => {
-                const monthYearElement = document.querySelector(".fc-center");
-                const MonthYear = monthYearElement.querySelector("h2").innerHTML;
-                const getMonthYear = MonthYear.split(' ');
-                const theMonth = monthMap[getMonthYear[0]];
-                const theYear = getMonthYear[1];
-                const queryString = `month=${theMonth}&year=${theYear}&view=week`;
-
-                // Get the current URL
-                const url = new URL(window.location.href);
-
-                // Update the query string
-                url.search = new URLSearchParams(queryString).toString();
-
-                // Refresh the page with the updated URL
-                window.location.href = url.toString();
-            });
-        });
-        const dayButton = document.querySelectorAll('.fc-timeGridDay-button');
-        dayButton.forEach(button => {
-            button.addEventListener('click', () => {
-                let monthYearElement = document.querySelector(".fc-center");
-                let MonthYear = monthYearElement.querySelector("h2").innerHTML;
-                let getMonthYear = MonthYear.split(' ');
-                let theMonth = monthMap[getMonthYear[0]];
-                let theYear = getMonthYear[1];
-                @if(isset($_GET['month']) && isset($_GET['year']))
-                    theMonth = {{strval(request()->get('month'))}};
-                    theYear = {{request()->get('year')}};
-                @endif
-
-                const queryString = `month=${theMonth}&year=${theYear}&view=day`;
-
-                // Get the current URL
-                const url = new URL(window.location.href);
-
-                // Update the query string
-                url.search = new URLSearchParams(queryString).toString();
-
-                // Refresh the page with the updated URL
-                window.location.href = url.toString();
-            });
+        $('#calendar').fullCalendar({
+            // options...
+            eventRender: function(event, element) {
+                element.find('.fc-title').append('<br>' + event.start.format('h:mm a') + ' - ' + event.end.format('h:mm a'));
+            }
         });
     </script>
     {{-- @endforeach --}}

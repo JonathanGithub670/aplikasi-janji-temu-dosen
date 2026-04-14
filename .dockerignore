@@ -1,0 +1,36 @@
+# Dependencies (will be installed in container)
+/vendor
+/node_modules
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDE files
+.idea
+.vscode
+*.swp
+*.swo
+
+# Environment (use .env.docker instead)
+.env
+
+# Docker files (no need to copy into image)
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Logs & cache (generated at runtime)
+storage/logs/*.log
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Documentation
+README.md
+DOCKER_README.md

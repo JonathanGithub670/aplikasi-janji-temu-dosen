@@ -134,7 +134,7 @@
         {{ $choose->user->nim }}<br>
         {{ $choose->user->name }}<br>
         {{-- {{ $choose->user->email }}<br> --}}
-        Springfield, ST 54321
+        {{ $choose->jabatan }}
 
         <br>
         <br>
@@ -152,7 +152,8 @@
         {{ $choose->create->nim }}<br>
         {{ $choose->create->name }}<br>
         {{-- {{ $choose->create->email }}<br>  --}}
-
+        Semester {{ $choose->semester }}<br>
+        {{ $choose->prodi }}<br>
         <br>
         <br>
         <br>

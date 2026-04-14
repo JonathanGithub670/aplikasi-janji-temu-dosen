@@ -173,7 +173,7 @@
                                 @can('isMahasiswa')
                                     <td style="text-align:center">{{ $history->user->name }}</td>
                                     {{-- <td style="text-align:center">{{ $history->create->name }}</td> --}}
-                                    
+
                                     <td style="text-align:center">
                                         {{ \Carbon\Carbon::parse($history->datetime)->translatedFormat('l, d F Y H:i') }}</td>
                                     <td style="text-align:center">
@@ -206,7 +206,7 @@
                                             <a href="{{ route('dashboard.list-pdf', $history->id) }}" class="badge bg-info"><i
                                                     class="fa fa-print fa-2x"></i></a>
                                         </td>
-                                    @endif 
+                                    @endif
                                 @elsecan('isAdmin')
                                     {{-- <td style="text-align:center">{{ $history->create->name }}</td> --}}
                                     {{-- <td style="text-align:center">{{ $history->user->name }}</td> --}}
@@ -256,7 +256,7 @@
                                                         </span><br><br>
                                                         {{-- <span style="font-size: x-large"> Email : <br>
                                                             <span class="badge bg-primary" style="font-size: x-large">
-                                                                
+
                                                                 @php
                                                                     $mahasiswa = \App\Models\User::where('id', $history->create_user_id)->first();
                                                                 @endphp
@@ -314,7 +314,7 @@
                                     {{-- <td style="text-align:center">
                                     <a href="{{ route('dashboard.list-lihat', $history->id) }}" class="badge bg-info "><i
                                             class="bi bi-eye fa-2x"></i></a>
-                                    
+
                                     </td> --}}
                                     {{-- @if ($history->status_reservasi === 1)
                                         <td style="text-align:center">
@@ -345,7 +345,7 @@
                                                 class="badge bg-info"><i class="bi bi-eye fa-2x"></i></a>
                                     @endif
                                     </td> --}}
-                                
+
                                 @endcan
                             </tr>
                         @empty
@@ -365,7 +365,7 @@
                     entries
                 </div>
                 <nav aria-label="Page navigation example">
-                    <div class="pagination justify-content-end">{!! $histories->links('vendor/pagination/custom') !!}</div>
+                    <div class="pagination justify-content-end">{!! $histories->appends($_GET)->links('vendor/pagination/custom') !!}</div>
                 </nav>
             </div>
         </div>
