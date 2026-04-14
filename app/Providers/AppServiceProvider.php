@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
         Carbon::setLocale('id');
 
         Blade::directive('role', function ($role) {
-            return "<?php if(\Auth::check() && in_array(\Auth::user()->role, $role)): ?>";
+            return "<?php if(\Illuminate\Support\Facades\Auth::check() && in_array(\Illuminate\Support\Facades\Auth::user()->role, $role)): ?>";
         });
         Blade::directive('endrole', function () {
             return "<?php endif; ?>";
