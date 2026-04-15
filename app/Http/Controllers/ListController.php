@@ -145,7 +145,7 @@ class ListController extends Controller
         $chooses = DB::table('chooses')
             ->join('users', 'create_user_id', '=', 'users.id')
             ->where('chooses.user_id', '=', auth()->id())
-            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS varchar(40)) as keterangan, date AS jam_mulai")
+            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS CHAR(40)) as keterangan, date AS jam_mulai")
             ->get();
         //return $chooses->get();
         $routines = DB::table('routines')
@@ -299,7 +299,7 @@ class ListController extends Controller
         // return Choose::where('user_id', auth()->id())->get();
         return DB::table('chooses')
             ->join('users', 'create_user_id', '=', 'users.id')
-            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS varchar(40)) as keterangan, date")
+            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS CHAR(40)) as keterangan, date")
             // ->select('chooses.*','nim','name','email','role','users.id as id_users', 'users.status as status_users')
             ->where('chooses.user_id', '=', auth()->id());
     }
@@ -309,7 +309,7 @@ class ListController extends Controller
         // return Choose::where('user_id', auth()->id())->get();
         return DB::table('chooses')
             ->join('users', 'create_user_id', '=', 'users.id')
-            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS varchar(40)) as keterangan, date");// ->select('chooses.*','nim','name','email','role','users.id as id_users', 'users.status as status_users')->paginate();
+            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS CHAR(40)) as keterangan, date");// ->select('chooses.*','nim','name','email','role','users.id as id_users', 'users.status as status_users')->paginate();
     }
 
 
@@ -394,7 +394,7 @@ class ListController extends Controller
         $chooses = DB::table('chooses')
             ->join('users', 'create_user_id', '=', 'users.id')
             ->where('chooses.user_id', '=', $request->id)
-            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS varchar(40)) as keterangan, date")
+            ->selectRaw("CAST(CONCAT(nim, ' | ', name) AS CHAR(40)) as keterangan, date")
             ->get();
         //return $chooses->get();
         $routines = DB::table('routines')
