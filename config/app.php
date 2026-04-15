@@ -22,5 +22,6 @@ return [
     'aliases' => [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
+        'Request' => Illuminate\Support\Facades\Request::class,
     ],
 ];
