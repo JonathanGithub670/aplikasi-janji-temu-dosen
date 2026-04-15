@@ -176,7 +176,7 @@ class ChooseController extends Controller
                 'pembahasan' => 'required',
                 'jam' => 'required|regex:/^\d{2}:\d{2} - \d{2}:\d{2}$/',
                 'fakeJam' => 'required',
-                'image' => 'nullable|file|mimes:pdf,doc,docx|max:1366',
+                'image' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
                 'keterangan' => 'required|max:200',
             ]);
 

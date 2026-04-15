@@ -236,7 +236,7 @@
                     <div class="mb-3">
                         <label for="image" class="form-label fs-5 ">Masukkan File</label>
                         <input class="form-control @error('image') is-invalid @enderror" type="file" id="image"
-                            name="image">
+                            name="image" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                         @error('image')
                             <div class="invalid-feedback">
                                 {{ $message }}
