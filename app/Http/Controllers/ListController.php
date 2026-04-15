@@ -151,7 +151,7 @@ class ListController extends Controller
         $routines = DB::table('routines')
             ->whereNot('keterangan', '=', 'ibadah')
             ->where('user_id', '=', auth()->id())
-            ->selectRaw('CAST(keterangan as varchar(40)) as keterangan, jam_mulai, jam_selesai, hari');
+            ->selectRaw('CAST(keterangan AS CHAR(40)) as keterangan, jam_mulai, jam_selesai, hari');
         //return $routines->count() + $chooses->count();
         $blueprint_routine_month = $routines->get();
         //$lists = $routines->unionAll($chooses)->get();
@@ -400,7 +400,7 @@ class ListController extends Controller
         $routines = DB::table('routines')
             ->whereNot('keterangan', '=', 'ibadah')
             ->where('user_id', '=', $request->id)
-            ->selectRaw('CAST(keterangan as varchar(40)) as keterangan, jam_mulai, jam_selesai, hari');
+            ->selectRaw('CAST(keterangan AS CHAR(40)) as keterangan, jam_mulai, jam_selesai, hari');
         //return $routines->count() + $chooses->count();
         $blueprint_routine_month = $routines->get();
         //$lists = $routines->unionAll($chooses)->get();
