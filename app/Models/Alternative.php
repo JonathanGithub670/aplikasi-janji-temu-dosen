@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Alternative extends Model
 {
+    protected $table = 'alternatif';
     protected $fillable = [
-        'nama_alternatif', 'alamat', 'no_hp',
+        'kode_alternatif', 'nama_alternatif',
     ];
     public $timestamps = false;
     protected $primaryKey = 'id_alternatif';
