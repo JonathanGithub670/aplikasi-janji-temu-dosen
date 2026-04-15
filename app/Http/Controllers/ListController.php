@@ -345,11 +345,11 @@ class ListController extends Controller
 
     public function lihat(Choose $choose)
     {
-        $prodi = DB::table('program_studi')->select('nama_program_studi')->where('prodi_create_user_id', '=', $choose->create_user_id)->first()->nama_program_studi;
+        $prodi = DB::table('program_studi')->select('nama_program_studi')->where('prodi_create_user_id', '=', $choose->create_user_id)->first()?->nama_program_studi ?? '-';
 
-        $jabatan = DB::table('jabatan')->select('jabatan')->where('create_user_id', '=', $choose->user_id)->first()->jabatan;
+        $jabatan = DB::table('jabatan')->select('jabatan')->where('create_user_id', '=', $choose->user_id)->first()?->jabatan ?? '-';
 
-        $jam_mulai = DB::table('time_chooses')->select('jam_mulai')->where('chooses_id', '=', $choose->id)->first()->jam_mulai;
+        $jam_mulai = DB::table('time_chooses')->select('jam_mulai')->where('chooses_id', '=', $choose->id)->first()?->jam_mulai ?? '00:00';
 
         $choose->date .= " " . $jam_mulai;
         $choose->prodi = $prodi;
@@ -362,11 +362,11 @@ class ListController extends Controller
     public function pdf(Choose $choose)
     {
         // echo $choose;
-        $prodi = DB::table('program_studi')->select('nama_program_studi')->where('prodi_create_user_id', '=', $choose->create_user_id)->first()->nama_program_studi;
+        $prodi = DB::table('program_studi')->select('nama_program_studi')->where('prodi_create_user_id', '=', $choose->create_user_id)->first()?->nama_program_studi ?? '-';
 
-        $jabatan = DB::table('jabatan')->select('jabatan')->where('create_user_id', '=', $choose->user_id)->first()->jabatan;
+        $jabatan = DB::table('jabatan')->select('jabatan')->where('create_user_id', '=', $choose->user_id)->first()?->jabatan ?? '-';
 
-        $jam_mulai = DB::table('time_chooses')->select('jam_mulai')->where('chooses_id', '=', $choose->id)->first()->jam_mulai;
+        $jam_mulai = DB::table('time_chooses')->select('jam_mulai')->where('chooses_id', '=', $choose->id)->first()?->jam_mulai ?? '00:00';
 
         $choose->date .= " " . $jam_mulai;
         $choose->prodi = $prodi;
