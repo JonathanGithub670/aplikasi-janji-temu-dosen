@@ -62,10 +62,21 @@ return new class extends Migration
             $table->date('mulai_perkuliahan')->nullable();
             $table->date('selesai_perkuliahan')->nullable();
         });
+
+        // Tabel Off Time (Jam Off Dosen)
+        Schema::create('off_time', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->date('tanggal')->nullable();
+            $table->string('keterangan')->nullable();
+            $table->time('jam_mulai');
+            $table->time('jam_selesai');
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('off_time');
         Schema::dropIfExists('routine_periods');
         Schema::dropIfExists('images');
         Schema::dropIfExists('chooses_alternatif');
