@@ -25,7 +25,7 @@ class ChooseController extends Controller
     public function index(): View
     {
         $users = User::where('users.id', '!=', auth()->id())
-            ->join('jabatan', 'users.id', '=', 'create_user_id')
+            ->leftJoin('jabatan', 'users.id', '=', 'jabatan.create_user_id')
             ->select(['users.id as id', 'users.name as name', 'jabatan'])
             ->where('status', 1)
             ->whereNot('role', '=', 'admin')

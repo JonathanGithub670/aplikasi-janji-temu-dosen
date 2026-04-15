@@ -7,6 +7,7 @@ use App\Models\Semester;
 use App\Models\Role;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
 
@@ -381,6 +382,15 @@ class DatabaseSeeder extends Seeder
 
             'isi_semester' => 'non-aktif',
         ]);
+
+        // Seed jabatan untuk semua dosen/chaplin/fungsionaris
+        $dosenUsers = User::whereNotIn('role', ['admin', 'mahasiswa'])->get();
+        foreach ($dosenUsers as $user) {
+            DB::table('jabatan')->insert([
+                'jabatan' => ucfirst($user->role),
+                'create_user_id' => $user->id,
+            ]);
+        }
 
         // Kriteria::create([
         //     'kode' => 'kode',
