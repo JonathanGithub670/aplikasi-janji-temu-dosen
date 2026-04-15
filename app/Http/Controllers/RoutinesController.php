@@ -149,6 +149,12 @@ class RoutinesController extends Controller
 
     public function off_store(Request $request): RedirectResponse
     {
+        $request->validate([
+            'user_id' => 'required',
+            'tanggal' => 'required',
+            'fakeJam' => 'required|array|min:1',
+        ]);
+
         $id = $request->user_id;
         $tanggal = DateTime::createFromFormat("m-d-Y", $request->tanggal)->format('Y-m-d');
 
