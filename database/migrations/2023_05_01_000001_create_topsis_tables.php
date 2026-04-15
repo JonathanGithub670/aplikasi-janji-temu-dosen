@@ -54,10 +54,19 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('path')->nullable();
         });
+
+        // Tabel Routine Periods (Periode Perkuliahan)
+        Schema::create('routine_periods', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->date('mulai_perkuliahan')->nullable();
+            $table->date('selesai_perkuliahan')->nullable();
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('routine_periods');
         Schema::dropIfExists('images');
         Schema::dropIfExists('chooses_alternatif');
         Schema::dropIfExists('results');
