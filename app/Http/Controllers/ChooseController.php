@@ -219,8 +219,9 @@ class ChooseController extends Controller
             return redirect()->route('dashboard.choose')
                 ->with('alert_type', 'success')
                 ->with('alert_message', 'Reservasi berhasil dibuat');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            return $e;
             return redirect()->back()
                 ->with('alert_type', 'danger')
                 ->with('alert_message', 'Reservasi gagal dibuat.');
