@@ -174,6 +174,7 @@ class ChooseController extends Controller
                 'user_id' => 'required|exists:users,id',
                 'date' => 'required',
                 'pembahasan' => 'required',
+                'semester' => 'required|exists:semester,id',
                 'jam' => 'required|regex:/^\d{2}:\d{2} - \d{2}:\d{2}$/',
                 'fakeJam' => 'required',
                 'image' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
@@ -186,16 +187,12 @@ class ChooseController extends Controller
 
             $date = date_format(date_create_from_format('m-d-Y', $request->date), 'Y-m-d');
 
-            $semester = DB::table('user_semesters')
-                ->select('semesters_id')
-                ->where('users_id', '=', auth()->id())->first()->semesters_id;
-
             $choose = new Choose();
             $choose->user_id = $request->user_id;
             $choose->create_user_id = auth()->id();
             $choose->date = $date;
             $choose->pembahasan = $request->get('pembahasan');
-            $choose->semester = $semester;
+            $choose->semester = $request->get('semester');
             $choose->no_pdf = self::generateOrderNR($choose->id);
             if ($request->hasFile('image')) {
                 $request->file('image')->move('upload-images/', $request->file('image')->getClientOriginalName());

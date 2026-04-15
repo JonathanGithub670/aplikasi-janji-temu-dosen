@@ -218,6 +218,22 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="semester" class="form-label fs-5 ">Pilih Semester</label>
+                        <select id="semester" name="semester"
+                            class="form-select @error('semester') is-invalid @enderror"
+                            aria-label="Default select example" required>
+                            <option selected value="" disabled>Pilih Semester</option>
+                            @foreach ($list_semester as $item)
+                                <option value="{{ $item->id }}">{{ $item->isi_semester }}</option>
+                            @endforeach
+                        </select>
+                        @error('semester')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
                         <label for="pembahasan" class="form-label fs-5 ">Pilih Pembahasan</label>
                         <select id="pembahasan" name="pembahasan"
                             class="form-select @error('pembahasan') is-invalid @enderror"
