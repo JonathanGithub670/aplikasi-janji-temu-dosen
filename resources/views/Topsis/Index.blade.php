@@ -340,7 +340,7 @@
                                                     <input type="hidden" name="id_alternatif" value="{{ $k->kode_alternatif }}">
                                                     <input type="hidden" name="id_kriteria[]" value="{{ $item->kode}}">
                                                         @php
-                                                            $existingData = DB::table('relations')
+                                                            $existingData = \DB::table('relations')
                                                                 ->where('alternatif', $k->kode_alternatif)
                                                                 ->where('kriteria', $item->kode)
                                                                 ->first();
