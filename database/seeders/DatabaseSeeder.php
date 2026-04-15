@@ -336,6 +336,14 @@ class DatabaseSeeder extends Seeder
             // 'ide_pembahasan'=>'Pemasangan CCTV'
             'ide_pembahasan' => 'Bimbingan PKL'
         ]);
+
+        DB::table('alternatif')->insert([
+            ['kode_alternatif' => 'A1', 'nama_alternatif' => 'Bimbingan Skripsi'],
+            ['kode_alternatif' => 'A2', 'nama_alternatif' => 'Bimbingan Akademik'],
+            ['kode_alternatif' => 'A3', 'nama_alternatif' => 'Bimbingan Konseling'],
+            ['kode_alternatif' => 'A4', 'nama_alternatif' => 'Bimbingan PKL'],
+        ]);
+
         Semester::create([
             'isi_semester' => 'Semester 1 (Satu)',
 
