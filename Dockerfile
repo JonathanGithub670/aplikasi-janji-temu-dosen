@@ -88,6 +88,12 @@ RUN chown -R $user:www-data /var/www/html \
 # Copy custom PHP config
 COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
 
+# Laravel optimization: cache config, routes, views
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache \
+    && php artisan event:cache
+
 # Switch to non-root user
 USER $user
 
