@@ -62,8 +62,8 @@ WORKDIR /var/www/html
 # Copy composer files first (for better caching)
 COPY composer.json composer.lock ./
 
-# Install PHP dependencies
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+# Install PHP dependencies (include dev for service providers compatibility)
+RUN composer install --no-scripts --no-autoloader --prefer-dist
 
 # Copy package files
 COPY package.json ./
