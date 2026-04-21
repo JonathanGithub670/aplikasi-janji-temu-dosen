@@ -120,7 +120,7 @@
     <div class="invoice-title">
         <h4 class="float-end font-size-16" align="right">{{$choose->no_pdf}}</h4>
         <div class="mb-4">
-            {{-- <img src="public/img/kominfo.png" alt="logo" height="20" align="left"/> --}}
+            {{-- <img src="public/img/logo-final.png" alt="logo" height="20" align="left"/> --}}
         </div>
     </div>
     <hr>

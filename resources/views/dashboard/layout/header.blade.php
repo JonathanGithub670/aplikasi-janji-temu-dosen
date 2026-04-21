@@ -6,12 +6,12 @@
                 <a href="{{ route('dashboard') }}" class="logo logo-light">
                     <span class="logo-sm">
                         {{-- <img src="{{ asset('assets/images/logo-light.svg') }}" alt="" height="22"> --}}
-                        <img src="{{ asset('img/kominfo.png') }}" alt="" height="25">
+                        <img src="{{ asset('img/logo-final.png') }}" alt="" height="25">
                     </span>
                     <!--sidebuka-->
                     <span class="logo-lg">
                         {{-- <img src="{{ asset('assets/images/logo-light.png') }}" alt="" height="19"> --}}
-                        <img src="{{ asset('img/kominfo.png') }}" alt="" height="30">
+                        <img src="{{ asset('img/logo-final.png') }}" alt="" height="30">
                         <span class="text-white" style="font-size: 15px">
                             Reservasi Online
                         </span>

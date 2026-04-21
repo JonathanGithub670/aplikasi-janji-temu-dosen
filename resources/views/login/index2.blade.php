@@ -16,7 +16,7 @@
         <div class="logo">
             {{-- <img src="https://www.freepnglogos.com/uploads/twitter-logo-png/twitter-bird-symbols-png-logo-0.png" alt=""> --}}
             {{-- <img src="/img/komputer.png" alt=""> --}}
-            <img src="/img/kominfo.png" alt="">
+            <img src="/img/logo-final.png" alt="">
         </div>
         <div class="text-center mt-3 mb-3 name">
             SIGN IN <br>

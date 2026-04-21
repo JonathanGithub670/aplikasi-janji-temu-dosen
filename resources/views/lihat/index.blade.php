@@ -41,7 +41,7 @@
                                 <div class="invoice-title">
                                     <h4 class="float-end font-size-16">{{ $choose->no_pdf }}</h4>
                                     <div>
-                                        <img src="{{ asset('img/kominfo.png') }}" alt="logo2" style="height: 80px;" />
+                                        <img src="{{ asset('img/logo-final.png') }}" alt="logo2" style="height: 80px;" />
                                     </div>
                                 </div>
                                 <hr>
